@@ -14,6 +14,7 @@ import (
 func main() {
 	heteronym := flag.Bool("e", false, "启用多音字模式")
 	style := flag.String("s", "zh4ao", "指定拼音风格。可选值：zhao, zh4ao, zha4o, zhao4, zh, z, ao, 4ao, a4o, ao4")
+	fallback := flag.String("b", "remove", "指定非汉字字符的处理方式。可选值：remove, keep")
 	flag.Parse()
 	hans := flag.Args()
 	stdin := []byte{}
@@ -32,6 +33,12 @@ func main() {
 	args := pinyin.NewArgs()
 	if *heteronym {
 		args.Heteronym = true
+	}
+
+	if *fallback == "keep" {
+		args.Fallback = func(r rune, a pinyin.Args) []string {
+			return []string{string(r)}
+		}
 	}
 
 	styleValues := map[string]int{
